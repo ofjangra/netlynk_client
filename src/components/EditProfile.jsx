@@ -1,10 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
+import Preload from './Preload'
 
 const API_endpoint = "http://localhost:5000"
 
 const EditProfile = () =>{
+    const [loading, setLoading] = useState(true)
     
     const navigate = useNavigate()
 
@@ -12,7 +14,10 @@ const EditProfile = () =>{
         getUserData()
     }, [])
 
+    
+
     const [error, setError] = useState(null)
+
 
     const inputRef = useRef(null)
 
@@ -33,10 +38,7 @@ const EditProfile = () =>{
 
     const [image, setImage] = useState(null)
 
-    const [errors, setErrors] = useState({
-        username: null,
-        email:null
-    })
+    const [updateError, setUpdateError] = useState(null)
 
    const formik = useFormik({
     initialValues:{
@@ -77,6 +79,8 @@ const EditProfile = () =>{
         })
         setImage(respJson.photo_url)
 
+        setLoading(false)
+
     }
 
 
@@ -87,10 +91,13 @@ const EditProfile = () =>{
 
     const updateProfile = async () =>{
         try{
+        setLoading(true)
+
         const updateProfileResp = await fetch(API_endpoint+"/editprofile", {
             method:"PUT",
             headers: {
                 "Content-Type":"application/json",
+                "Authorization":"Bearer "+localStorage.getItem("access_token")
             },
             body: JSON.stringify({
                 username:formik.values.username,
@@ -100,14 +107,13 @@ const EditProfile = () =>{
             credentials:"include"
         })
         const updateProfileRespJson = await updateProfileResp.json()
+        console.log(updateProfileRespJson)
         if(updateProfileRespJson.error){
-            setErrors({
-                username: updateProfileRespJson.error.username,
-                email:updateProfileRespJson.error.email
-            })
+            setLoading(false)
+           return setUpdateError(updateProfileRespJson.error)
         }
         if(updateProfileRespJson.message){
-            navigate('/admin')
+            return setLoading(false)
         }
         } catch(err){
             
@@ -120,6 +126,7 @@ const EditProfile = () =>{
 
 
     const updateProfilePhoto = async () =>{
+        setLoading(true)
         const data = new FormData()
         data.append('file', image)
         data.append("upload_preset", "instaclone")
@@ -143,7 +150,7 @@ const EditProfile = () =>{
             
         })
         if(updatePhotoResp.status == 200){
-            navigate("/admin")
+            setLoading(false)
         }
 
     }
@@ -166,6 +173,7 @@ const EditProfile = () =>{
       >Login again</Link>
     </div> :
         <>
+        { loading ? <Preload h={"60px"} w = {"60px"} r = {"30px"}/> : 
             <div className='editProfile_wrapper'>
                 <h3>Edit Profile</h3>
                 <div className='editProfile'>
@@ -203,7 +211,7 @@ const EditProfile = () =>{
                                 onBlur = {formik.handleBlur}
                                 />
                             </div>
-                            <p>{errors.username}</p>
+                            {updateError === "Username already taken" ? <p style={{color:"firebrick"}}>{updateError}</p> : null}
                         </div>
                     </div>
                  
@@ -218,7 +226,7 @@ const EditProfile = () =>{
                                 onBlur = {formik.handleBlur}
                                 />
                             </div>
-                            <p>{errors.email}</p>
+                            {updateError === "Email already taken" ? <p style={{color:"firebrick"}}>{updateError}</p> : null}
                         </div>
                     </div>
 
@@ -239,6 +247,7 @@ const EditProfile = () =>{
                     <button onClick={updateProfile}>Save Profile</button>
                 </div>
             </div>
+        }
         </>
     )
 }

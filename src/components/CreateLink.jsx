@@ -27,6 +27,7 @@ const CreateLink = ({ open, onClose }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization":"Bearer "+localStorage.getItem("access_token")
         },
         body: JSON.stringify(body),
         credentials: "include",

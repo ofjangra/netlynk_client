@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import * as ReactDOM from "react-dom";
 
@@ -37,6 +36,7 @@ const EditLink = ({ open, onClose, linkVals }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization":"Bearer "+localStorage.getItem("access_token")
         },
         body: JSON.stringify(body),
         credentials: "include",
@@ -61,6 +61,7 @@ const EditLink = ({ open, onClose, linkVals }) => {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          "Authorization":"Bearer "+localStorage.getItem("access_token")
         },
         credentials: "include",
       });
