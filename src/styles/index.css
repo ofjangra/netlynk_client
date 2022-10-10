@@ -1,0 +1,161 @@
+@font-face {
+    font-family: questrial;
+    src: url('/public/font/Muli-Regular.ttf');
+}
+@font-face {
+    font-family: now;
+    src: url('../../public/font/Sen-Regular.ttf');
+}
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: rgb(255, 255, 255);
+    font-family: now;
+}
+
+.fullScreenContainer, .signupMain{
+height: auto;
+min-height: 680px;
+width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: space-around;
+/* padding: 32px; */
+}
+.loginSignup{
+    height: 80%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 32px;
+}
+.heroImg{
+    height: 80%;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+    border-right: 1px solid gray;
+    font-family: questrial;
+    font-weight: bold;
+    font-size: 28px;
+    color: rgb(61, 61, 61);
+}
+.heroImg img{
+    height: 60px;
+    width: auto;
+    margin-bottom: 20px;
+    
+}
+
+button{
+    height: auto;
+    width: auto;
+    border: none;
+    background-color: #00aa88;
+    border-radius: 2px;
+    padding: 8px 20px 8px 20px;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+
+.formActions{
+    height: 80%;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    padding: 20px;
+}
+.formActions form{
+height: auto;
+width: auto;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: space-around;
+}
+.formActions form button{
+    margin-top: 15px;
+    width: 280px;
+}
+.inputField{
+    height: auto;
+    width: 280px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-around;
+    margin: 10px 0 10px 0;
+}
+.inputField input{
+    height: auto;
+    width: 100%;
+    min-width: 240px;
+    border: 1px solid #000000;
+    background:none;
+    padding: 10px 0 10px 8px;
+    border-radius: 2px;
+    
+}
+
+.inputField input:focus{
+    outline: 0;
+}
+.inputField p{
+    color: firebrick;
+    font-size: 14px;
+    margin-top: 2px;
+    text-align: right;
+}
+
+
+
+.notAccount{
+    height: auto;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+.notAccount *{
+    margin: 5px 0 5px 0;
+}
+
+.link{
+    text-decoration: none;
+}
+
+.fullScreenContainer h4, .signupMain h4{
+    color: gray;
+    cursor: pointer;
+}
+.fullScreenContainer h4:hover{
+    color: #000000;
+}
+
+
+@media screen and (max-width:720px){
+  .loginSignup{
+      flex-direction: column;
+  }
+  .heroImg {
+      height: auto;
+      border:none;
+  }
+  .heroImg h1{
+      display: none;
+  }
+}

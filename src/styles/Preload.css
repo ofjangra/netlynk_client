@@ -1,0 +1,26 @@
+.preloadContainer{
+    height: auto;
+    width: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.spinner{
+    border-left: 3px solid rgb(20, 20, 20);
+    border-bottom: 2px solid rgb(20, 20, 20);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: rotate 2s infinite;
+    }
+
+@keyframes rotate{
+ from{
+     transform: rotate(0deg);
+ }
+ to{
+     transform: rotate(360deg);
+ }
+}

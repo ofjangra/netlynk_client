@@ -1,0 +1,153 @@
+.home_profile{
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+}
+.profileLink{
+    position: absolute;
+    top:50px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: auto;
+    width: 320px;
+    padding: 20px;
+    background-color: #00aa88;
+    border-radius: 5px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow: 4px 4px 8px rgb(56, 56, 56);
+    
+}
+.profileLink p:last-child{
+    margin-top: 10px;
+}
+
+
+#closeToast{
+   position: absolute;
+   top:10px;
+   right: 10px;
+   cursor: pointer;
+}
+.userProfile{
+    height: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+.profileDetails{
+    height: auto;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0 40px 0;
+}
+
+.profilePhoto{
+    height: 120px;
+    width: 120px;
+    /* border-radius: 60px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.profilePhoto img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 60px;
+    border:2px solid gray
+}
+.aside_profile{
+    height: auto;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-around;
+    margin-left: 40px;
+}
+.profileName{
+    height: auto;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    
+}
+.profileName h5{
+    font-size: 28px;
+    margin-right: 40px;
+    font-weight: lighter;
+}
+.aside_profile p{
+    margin-top: 10px;
+}
+.editButtons{
+    height: auto;
+    width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* background-color: #00aa88; */
+}
+.editButtons button{
+    color:#000000;
+    border: 1px solid #4d4d4d;
+    cursor: pointer;
+    height: auto;
+    width: auto;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+}
+
+.userLinks{
+    height: auto;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    margin-top: 50px;
+}
+.userLinks h2{
+    font-weight: lighter;
+}
+.userLinks a{
+    height: auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(20, 20, 20);
+    padding: 20px;
+    color: #000000;
+    font-size: 18px;
+    margin-bottom: 32px;
+    text-decoration: none;
+    position: relative;
+}
+
+#logout{
+    position: fixed;
+    top:20px;
+    right: 20px;
+    border:1px solid #000000;
+    color:#000000;
+    background: none;
+    border-radius: 2px;
+}
