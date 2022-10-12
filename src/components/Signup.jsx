@@ -9,7 +9,7 @@ const Signup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const tokenPresent = localStorage.getItem("netlynk_jwt");
+    const tokenPresent = localStorage.getItem("access_token");
     if (tokenPresent) {
       navigate("/admin");
     }
@@ -33,8 +33,8 @@ const Signup = () => {
       const respJson = await resp.json();
 
       if (respJson.token) {
-        localStorage.setItem("jwtoken", respJson.token);
-        navigate("/admin");
+        localStorage.setItem("access_token", respJson.token);
+        return navigate("/admin");
       }
     } catch (err) {}
   };
@@ -72,6 +72,7 @@ const Signup = () => {
     },
     validationSchema: Yup.object({
       username: Yup.string()
+        .matches(/^[a-z0-9_-]{3,16}$/igm, "Username can only contain alphabets, numericals, and _")
         .required("Username is Required")
         .max(16, "maximum 16 characters are allowed")
         .min(3, "minimum 3 charactes are required"),
@@ -94,7 +95,7 @@ const Signup = () => {
             <h1>
               One link
               <br />
-              for your all
+              for multiple
               <br />
               social links
             </h1>

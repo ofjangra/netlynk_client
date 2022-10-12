@@ -12,7 +12,7 @@ const Login = () =>{
     const navigate = useNavigate()
 
     useEffect(()=>{
-        const tokenPresent = localStorage.getItem("netlynk_jwt")
+        const tokenPresent = localStorage.getItem("access_token")
         if(tokenPresent){
             return navigate("/admin")
         }
@@ -69,7 +69,7 @@ const Login = () =>{
                 <div className='heroImg'>
                     <img src = "/img/netlynk_logo.svg"
                         alt='logo'/>
-                    <h1>One link<br/>for your all<br/>social links</h1>
+                    <h1>One link<br/>for multiple<br/>social links</h1>
                 </div>
                 <div className='formActions'>
                     <form onSubmit={formik.handleSubmit}>

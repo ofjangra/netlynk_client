@@ -62,8 +62,8 @@ const Admin = () => {
       return localStorage.clear()
     }
     setUserData(respJson);
-
-    getAllLinks(respJson._id);
+  
+    getAllLinks(respJson.id);
 
   };
 

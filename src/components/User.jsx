@@ -16,10 +16,7 @@ const User = () =>{
 
     const {username} = params
 
-    const [userData, setUserData] = useState({
-        user:{},
-        user_props:{},
-    })
+    const [userData, setUserData] = useState({})
 
     const [links, setLinks] = useState([])
 
@@ -42,12 +39,9 @@ const User = () =>{
             setLoading(false)
             return setError(respJson.error)
         }
-        setUserData({
-            user:respJson.user,
-            user_props:respJson.user_props
-        })
+        setUserData(respJson)
 
-        getAllLinks(respJson.user._id)
+        getAllLinks(respJson._id)
 
        
     }
@@ -74,7 +68,7 @@ const User = () =>{
             <Preload h={"60px"} w = {"60px"} r = {"30px"}/> 
             : error ? <UserNotFound/> :
             <Profile
-            userdata={userData.user}
+            userdata={userData}
             links={links}
             />
 

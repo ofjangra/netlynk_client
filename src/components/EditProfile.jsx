@@ -66,7 +66,7 @@ const EditProfile = () =>{
         })
 
         const respJson = await resp.json()
-        // console.log(respJson)
+        console.log(respJson)
 
         if (respJson.error){
             setError(respJson.error)
@@ -216,7 +216,7 @@ const EditProfile = () =>{
                     </div>
                  
                     <div className='editField'>
-                        <label htmlFor='email_editField'>email No.</label>
+                        <label htmlFor='email_editField'>Email</label>
                         <div className='email_editField' id = "email_editField">
                             <div className='text_editField'>
                                 <input type = "email"
