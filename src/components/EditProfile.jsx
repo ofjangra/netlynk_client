@@ -1,25 +1,42 @@
 import React, {useState, useEffect, useRef} from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { storage } from '../firebase'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { v4 } from 'uuid'
+import { useSelector, useDispatch } from "react-redux";
+import { updateProfile, activateLoading } from '../store/slice/userSlice'
 import { useFormik } from 'formik'
-import Preload from './Preload'
+import * as Yup from 'yup'
 
-const API_endpoint = "http://localhost:5000"
 
 const EditProfile = () =>{
-    const [loading, setLoading] = useState(true)
-    
-    const navigate = useNavigate()
+    const error = useSelector((state) => state.user.auth.error)
 
-    useEffect(()=>{
-        getUserData()
-    }, [])
+    const userData = useSelector((state) => state.user.profile)
 
-    
 
-    const [error, setError] = useState(null)
+    const [image, setImage] = useState(null)
 
 
     const inputRef = useRef(null)
+
+    const [file, setFile] = useState(null)
+
+    const dispatch = useDispatch()
+
+
+    useEffect(() =>{
+        formik.setValues({
+            username:userData.username,
+            name:userData.name,
+            email:userData.email,
+            bio:userData.bio
+        })
+        setImage(userData.photo_url)
+    },[])
+
+  
+
 
     const fileRefClick = () =>{
         inputRef.current.click()
@@ -32,148 +49,86 @@ const EditProfile = () =>{
             reader.readAsDataURL(file)
             reader.onloadend = () =>{
                 setImage(reader.result)
+                setFile(file)
             }
     }
 
 
-    const [image, setImage] = useState(null)
+    
 
-    const [updateError, setUpdateError] = useState(null)
+   
 
    const formik = useFormik({
     initialValues:{
         username:"",
+        name:"",
         email:"",
         bio:""
-    }
+    },
+    validationSchema:Yup.object({
+        username:Yup.string()
+        .required('username is required')
+        .min(3, 'minimum, 3 characters are required')
+        .max(16, 'minimum 16 characters are required')
+        .matches(/^[a-zA-Z0-9_-]{3,16}$/igm, "Username can only contain alphabets, numericals, - and _"),
+        email:Yup.string().email("Invalid email format").required('Email is required')
+    })
    })
 
   
 
-    const getUserData = async () =>{
-        const tokenPresent = localStorage.getItem("access_token")
-
-        if (!tokenPresent){
-            return navigate("/account/login")
-        }
-        const resp = await fetch(API_endpoint+'/profile', {
-            method:"GET",
-            headers:{
-                "Content-Type":"application/json",
-                "Authorization":"Bearer " + tokenPresent
-            },
-            credentials:'include'
-        })
-
-        const respJson = await resp.json()
-        console.log(respJson)
-
-        if (respJson.error){
-            setError(respJson.error)
-            return localStorage.clear()
-        }
-        formik.setValues({
-            username:respJson.username,
-            email:respJson.email,
-            bio:respJson.bio,
-        })
-        setImage(respJson.photo_url)
-
-        setLoading(false)
-
-    }
-
 
   
 
 
-    //// update profile details _______________________
+    // update profile details _______________________
 
-    const updateProfile = async () =>{
-        try{
-        setLoading(true)
+    const updateUserProfile = async () =>{
+        dispatch(activateLoading(true))
+        const formValues = {}
+        if (userData.name !== formik.values.name) {
+            formValues.name = formik.values.name
+        } 
+        if (userData.username !== formik.values.username) {
+            formValues.username = formik.values.username
+        }
+        if (userData.email !== formik.values.email) {
+            formValues.email = formik.values.email
+        } 
+        if (userData.bio !== formik.values.bio) {
+            formValues.bio = formik.values.bio
+        } 
 
-        const updateProfileResp = await fetch(API_endpoint+"/editprofile", {
-            method:"PUT",
-            headers: {
-                "Content-Type":"application/json",
-                "Authorization":"Bearer "+localStorage.getItem("access_token")
-            },
-            body: JSON.stringify({
-                username:formik.values.username,
-                email:formik.values.email,
-                bio:formik.values.bio,
-            }),
-            credentials:"include"
-        })
-        const updateProfileRespJson = await updateProfileResp.json()
-        console.log(updateProfileRespJson)
-        if(updateProfileRespJson.error){
-            setLoading(false)
-           return setUpdateError(updateProfileRespJson.error)
-        }
-        if(updateProfileRespJson.message){
-            return setLoading(false)
-        }
-        } catch(err){
-            
-        }
+
+        dispatch(updateProfile(formValues))
     }
+   
 
 
-    /// update profile photo _________________________ 
 
 
 
     const updateProfilePhoto = async () =>{
-        setLoading(true)
-        const data = new FormData()
-        data.append('file', image)
-        data.append("upload_preset", "instaclone")
-        data.append("cloud_name","ofjangra")
-       const cloudinaryResp = await fetch("https://api.cloudinary.com/v1_1/ofjangra/image/upload",{
-            method:"POST",
-            body: data
-        })
-        const cloudinaryRespJson = await cloudinaryResp.json()
-        const cloudRespImageUrl = await cloudinaryRespJson.url
-
-        const updatePhotoResp = await fetch(API_endpoint+'/editprofile/photo',{
-            method:"PUT",
-            headers:{
-                "Content-Type":"application/json",
-            },
-            body:JSON.stringify({
-                photo_url:cloudRespImageUrl
-            }),
-            credentials:"include",
-            
-        })
-        if(updatePhotoResp.status == 200){
-            setLoading(false)
+        if (file == null) {
+            return
         }
+        const imageRef = ref(storage, `images/${file.name + v4()}`)
+
+        await uploadBytes(imageRef, file)
+
+        const imageUrl = await getDownloadURL(imageRef)
+
+        dispatch(activateLoading(true))
+
+        dispatch(updateProfile({
+            photo_url:imageUrl
+        }))
 
     }
 
     return(
-        error ? 
-    <div style = {{position:"absolute", 
-    top:"50%", left:"50%", 
-    transform:"translate(-50%, -50%)", 
-    display:"flex",
-    flexDirection:"column",
-    alignItems:"center", 
-    justifyContent:"center"}}>
-      <h2>{error}</h2>
-      <Link to = "/account/login"
-      style = {{
-        color:"#00aa88",
-        textDecoration:"none"
-      }}
-      >Login again</Link>
-    </div> :
         <>
-        { loading ? <Preload h={"60px"} w = {"60px"} r = {"30px"}/> : 
+        
             <div className='editProfile_wrapper'>
                 <h3>Edit Profile</h3>
                 <div className='editProfile'>
@@ -195,59 +150,66 @@ const EditProfile = () =>{
                                 justifyContent:"space-around"
                                 }}>
                             <button onClick = { fileRefClick} style = {{marginBottom:"10px"}}>New Photo</button>
-                            <button style={{marginTop:"10px"}} onClick= {updateProfilePhoto}>Save Photo</button>
+
+                            {
+                                !file ?
+
+                                <button style={{marginTop:"10px", opacity:"40%"}}>Save Photo</button> :
+                                <button style={{marginTop:"10px"}} onClick= {updateProfilePhoto}>Save Photo</button>
+                            }
+                            
                             </div>
                         </div>
                     </div>
                    
                     <div className='editField'>
-                        <label htmlFor='username_editField'>Username</label>
-                        <div className='username_editField' id = "username_editField">
-                            <div className='text_editField'>
+                                <label htmlFor='username_editField'>Username</label>
                                 <input type = "text"
-                                value={formik.values.username}
                                 name="username"
-                                onChange={formik.handleChange}
-                                onBlur = {formik.handleBlur}
+                                id = "username_editField"
+                               {...formik.getFieldProps("username")}
                                 />
-                            </div>
-                            {updateError === "Username already taken" ? <p style={{color:"firebrick"}}>{updateError}</p> : null}
-                        </div>
+                                {formik.errors.username ? <p>{formik.errors.username}</p> : null}
+                                {error === "username already taken" ? <p className='input_error'>{error}</p> : null}
                     </div>
                  
+
+                    <div className='editField'>
+                        <label htmlFor='name_editField'>Name</label>
+                                <input type = "text"
+                                id = "name_editField"
+                                name="name"
+                                {...formik.getFieldProps("name")}
+                                />
+                           
+                    </div>
+
                     <div className='editField'>
                         <label htmlFor='email_editField'>Email</label>
-                        <div className='email_editField' id = "email_editField">
-                            <div className='text_editField'>
                                 <input type = "email"
-                                value={formik.values.email}
                                 name="email"
-                                onChange = {formik.handleChange}
-                                onBlur = {formik.handleBlur}
+                                id = "email_editField"
+                                {...formik.getFieldProps("email")}
                                 />
-                            </div>
-                            {updateError === "Email already taken" ? <p style={{color:"firebrick"}}>{updateError}</p> : null}
-                        </div>
+                                {formik.errors.email ? <p>{formik.errors.email}</p> : null}
+                            {error === "email already taken" ? <p className='input_error'>{error}</p> : null}
                     </div>
 
                     <div className='editField'>
                         <label htmlFor='bio_editField'>Bio</label>
-                        <div className='bio_editField' id = "bio_editField">
-                            <div className='text_editField'>
                                 <textarea
                                 name = "bio"
+                                id = "bio_editField"
                                 value = {formik.values.bio}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 />
-                            </div>
-                        </div>
                     </div>
 
-                    <button onClick={updateProfile}>Save Profile</button>
+                    <button onClick={() => updateUserProfile()}>Save Profile</button>
                 </div>
             </div>
-        }
+    
         </>
     )
 }

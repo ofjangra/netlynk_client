@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import Profile from './Profile'
 import Preload from './Preload'
 import UserNotFound from './UserNotFound'
@@ -10,8 +11,8 @@ import UserNotFound from './UserNotFound'
 
 const User = () =>{
 
-    const API_endpoint = "http://localhost:5000"
-    
+    const adminUsername = useSelector((state) => state.user.profile.username)
+
     const params = useParams()
 
     const {username} = params
@@ -26,7 +27,7 @@ const User = () =>{
 
     const getUser = async () =>{
 
-        const resp = await fetch(API_endpoint+`/user/${username}`,{
+        const resp = await fetch(`/api/user/${username}`,{
             method:"GET",
             credentials:"include",
             headers:{
@@ -35,27 +36,21 @@ const User = () =>{
         })
 
         const respJson = await resp.json()
-        if (respJson.error){
+        if (respJson.success){
             setLoading(false)
-            return setError(respJson.error)
+            setUserData(respJson.profile)
+            return setLinks(respJson.profile.links)
         }
-        setUserData(respJson)
+        if (!respJson.success){
+            setLoading(false)
+            return setError(respJson.message)
+        }
 
-        getAllLinks(respJson._id)
+        
 
        
     }
 
-    const getAllLinks = async(id) =>{
-        const resp = await fetch(API_endpoint + `/links/${id}`)
-    
-        const respJson = await resp.json()
-
-       
-        setLinks(respJson)
-        setLoading(false)
-        
-      }
 
     useEffect(() =>{
         getUser()
@@ -64,6 +59,8 @@ const User = () =>{
     return(
         <>
         {
+            username === adminUsername ?
+            <Navigate to = "/admin"/> :
             loading ? 
             <Preload h={"60px"} w = {"60px"} r = {"30px"}/> 
             : error ? <UserNotFound/> :

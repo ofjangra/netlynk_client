@@ -49,8 +49,8 @@
 
 #editlink{
     position: absolute;
-    top:-5px;
-    right:-5px;
+    top:-8px;
+    right:20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,3 +79,7 @@
    color: #000;
 
 }
+/* 
+#deleteLink:hover{
+    box-shadow: 0 4px 8px 0 rgba(43, 42, 42, 0.068), 0 6px 20px 0 rgba(68, 68, 68, 0.19);
+} */

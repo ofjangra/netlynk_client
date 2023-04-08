@@ -1,83 +1,22 @@
-import React, { useEffect, useState } from "react";
-
-
+import React from "react";
+import { editLink, deleteLink } from "../store/slice/userSlice";
 import * as ReactDOM from "react-dom";
-
+import { useDispatch } from "react-redux";
 const modalRoot = document.querySelector(".modalRoot");
-
 import { useFormik } from "formik";
-
 import * as Yup from "yup";
-
 import { Close } from "@mui/icons-material";
-import Preload from "./Preload";
 
 const EditLink = ({ open, onClose, linkVals }) => {
 
- 
-
-  const API_endpoint = "http://localhost:5000"
   
   if (!open) {
     return null;
   }
  
+  const dispatch = useDispatch()
 
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  function refreshPage() {
-    window.location.reload(false);
-  }
-
-  const editlink = async (body) => {
-    try {
-      const resp = await fetch(API_endpoint + `/editlink/${linkVals.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization":"Bearer "+localStorage.getItem("access_token")
-        },
-        body: JSON.stringify(body),
-        credentials: "include",
-      });
-
-      setLoading(true);
-
-      const respJson = await resp.json();
-
-      if (respJson.error) {
-        setError(respJson.error);
-      }
-      onClose();
-      refreshPage();
-    } catch (err) {}
-  };
-
-  const deleteLink = async () =>{
-    
-    try {
-      const resp = await fetch(API_endpoint + `/deletelink/${linkVals.id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization":"Bearer "+localStorage.getItem("access_token")
-        },
-        credentials: "include",
-      });
-
-      setLoading(true);
-
-      const respJson = await resp.json();
-
-      if (respJson.error) {
-        setError(respJson.error);
-      }
-      onClose();
-      refreshPage();
-    } catch (err) {
-    }
-  }
+  
 
   const formik = useFormik({
     initialValues: {
@@ -92,9 +31,6 @@ const EditLink = ({ open, onClose, linkVals }) => {
         .url("Please enter a valid url")
         .required("URL is required"),
     }),
-    onSubmit: (values) => {
-      editlink(values);
-    },
   });
 
 
@@ -107,11 +43,7 @@ const EditLink = ({ open, onClose, linkVals }) => {
           style={{ cursor: "pointer" }}
           id="modalCloseBtn"
         />
-        {loading ? 
-          <Preload h={"40px"} w={"40px"} r={"20px"} />
-        : error ? 
-          <p style={{ color: "firebrick" }}>{error}</p>
-         : 
+
          <div className="formContainer">
           <form onSubmit={formik.handleSubmit}>
             <strong>Edit Link</strong>
@@ -147,12 +79,14 @@ const EditLink = ({ open, onClose, linkVals }) => {
            
           </form>
           <div className="linkActions">
-            <button type="submit" onClick={formik.submitForm}>Update Link</button>
-            <button type = "submit" id = "deleteLink" onClick={() =>deleteLink()}>Delete Link</button>
+            <button type="submit" onClick={() => dispatch(editLink({
+              values:formik.values,
+              id:linkVals.id
+            }))}>Update Link</button>
+            <button type = "submit" id = "deleteLink" onClick={() => dispatch(deleteLink(linkVals.id))}>Delete Link</button>
             
             </div>
           </div>
-        }
       </div>
     </>,
     modalRoot

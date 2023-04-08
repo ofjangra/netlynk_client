@@ -1,49 +1,18 @@
 import React, { useState } from "react";
-
 import * as ReactDOM from "react-dom";
-
 const modalRoot = document.querySelector(".modalRoot");
-
 import { useFormik } from "formik";
-
 import * as Yup from "yup";
-
 import { Close } from "@mui/icons-material";
 import Preload from "./Preload";
+import { useDispatch } from "react-redux";
+import { activateLoading } from "../store/slice/userSlice";
+import { createLink } from "../store/slice/userSlice";
+
 
 const CreateLink = ({ open, onClose }) => {
-  const API_endpoint = "http://localhost:5000";
 
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  function refreshPage() {
-    window.location.reload(false);
-  }
-
-  const createlink = async (body) => {
-    try {
-      const resp = await fetch(API_endpoint + "/createlink", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization":"Bearer "+localStorage.getItem("access_token")
-        },
-        body: JSON.stringify(body),
-        credentials: "include",
-      });
-
-      setLoading(true);
-
-      const respJson = await resp.json();
-
-      if (respJson.error) {
-        setError(respJson.error);
-      }
-      onClose();
-      refreshPage();
-    } catch (err) {}
-  };
+  const dispatch = useDispatch()
 
   const formik = useFormik({
     initialValues: {
@@ -59,7 +28,8 @@ const CreateLink = ({ open, onClose }) => {
         .required("URL is required"),
     }),
     onSubmit: (values) => {
-      createlink(values);
+      dispatch(activateLoading())
+      dispatch(createLink(values))
     },
   });
 
@@ -75,11 +45,7 @@ const CreateLink = ({ open, onClose }) => {
           style={{ cursor: "pointer" }}
           id="modalCloseBtn"
         />
-        {loading ? (
-          <Preload h={"40px"} w={"40px"} r={"20px"} />
-        ) : error ? (
-          <p style={{ color: "firebrick" }}>{error}</p>
-        ) : (
+        
           <div className="formContainer">
           <form onSubmit={formik.handleSubmit}>
           <strong>Create New Link</strong>
@@ -117,7 +83,6 @@ const CreateLink = ({ open, onClose }) => {
           <button type="submit" onClick={formik.submitForm}>Create Link</button>
           </div>
           </div>
-        )}
       </div>
     </>,
     modalRoot

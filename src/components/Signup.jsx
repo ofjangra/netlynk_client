@@ -1,49 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
+import { authenticateUser } from "../store/slice/userSlice";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
 
 const Signup = () => {
-  const API_endpoint = "http://localhost:5000";
 
-  const navigate = useNavigate();
+  const dispatch = useDispatch()
 
-  useEffect(() => {
-    const tokenPresent = localStorage.getItem("access_token");
-    if (tokenPresent) {
-      navigate("/admin");
-    }
-  }, []);
-
-  const [error, setError] = useState("");
-
-  const signinUser = async (username, password) => {
-    try {
-      const resp = await fetch(API_endpoint + "/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          username,
-          password,
-        }),
-      });
-      const respJson = await resp.json();
-
-      if (respJson.token) {
-        localStorage.setItem("access_token", respJson.token);
-        return navigate("/admin");
-      }
-    } catch (err) {}
-  };
+  const [error, setError] = useState("")
 
   const signupUser = async () => {
     const { username, email, password } = formik.values;
 
     try {
-      const signUpResp = await fetch(API_endpoint + "/signup", {
+      const signUpResp = await fetch("/api/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,10 +28,13 @@ const Signup = () => {
       });
       const signUpRespJson = await signUpResp.json();
 
-      if (signUpRespJson.message) {
-        await signinUser(username, password);
-      } else if (signUpRespJson.error) {
-        setError(signUpRespJson.error);
+      if (signUpRespJson.success) {
+        dispatch(authenticateUser({
+          username,
+          password,
+        }))
+      } else if (!signUpRespJson.success) {
+        setError(signUpRespJson.message);
       }
     } catch (err) {}
   };
@@ -72,7 +47,7 @@ const Signup = () => {
     },
     validationSchema: Yup.object({
       username: Yup.string()
-        .matches(/^[a-z0-9_-]{3,16}$/igm, "Username can only contain alphabets, numericals, and _")
+        .matches(/^[a-z0-9_-]{3,16}$/igm, "Username can only contain alphabets, numericals, -, and _")
         .required("Username is Required")
         .max(16, "maximum 16 characters are allowed")
         .min(3, "minimum 3 charactes are required"),
@@ -82,7 +57,7 @@ const Signup = () => {
         .max(34, "maximum 34 characters are allowed")
         .min(8, "minimum 8 characters are required"),
     }),
-    onSubmit: (values) => {
+    onSubmit: () => {
       signupUser();
     },
   });

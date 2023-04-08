@@ -1,7 +1,7 @@
 
 
 
-const PreLoad = () =>{
+const InitLoad = () =>{
     return(
         <>
             <div style = {{
@@ -17,8 +17,8 @@ const PreLoad = () =>{
                 zIndex:'20',
                 backgroundColor:"#fff"
             }}>
-                <img src = "/public/spinner.svg" alt = "logo" style = {{
-                    height:"160px",
+                <img src = "/netlynk_logo.svg" alt = "logo" style = {{
+                    height:"120px",
                     width:"auto"
                 }}/>
             </div>
@@ -26,4 +26,4 @@ const PreLoad = () =>{
     )
 }
 
-export default PreLoad
+export default InitLoad

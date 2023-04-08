@@ -3,50 +3,16 @@ import React, {useEffect, useState} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-
-const API_endpoint = "http://localhost:5000"
+import {useDispatch, useSelector} from 'react-redux'
+import { authenticateUser } from '../store/slice/userSlice'
 
 
 const Login = () =>{
 
-    const navigate = useNavigate()
-
-    useEffect(()=>{
-        const tokenPresent = localStorage.getItem("access_token")
-        if(tokenPresent){
-            return navigate("/admin")
-        }
-    }, [])
-
+    const dispatch = useDispatch()
    
 
-    const [error, setError] = useState("")
-    const signin = async (body) =>{
-        try{
-        const resp = await fetch(API_endpoint + "/signin", {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json",
-                
-            },
-            body:JSON.stringify(body),
-            credentials:'include',
-            
-        })
-
-        const respJson = await resp.json()
-
-        if (respJson.error){
-            return setError(respJson.error)
-        }
-
-        localStorage.setItem("access_token", respJson.token)
-
-        return navigate("/admin")
-    } catch(err){
-        console.log(err)
-    }
-    }
+    const authError = useSelector((state) =>state.user.auth.error)
 
     const formik = useFormik({
         initialValues:{
@@ -58,7 +24,7 @@ const Login = () =>{
             password: Yup.string().required("Please enter password")
         }),
         onSubmit: values =>{
-            signin(values)
+            dispatch(authenticateUser(values))
         }
     })
    
@@ -73,7 +39,7 @@ const Login = () =>{
                 </div>
                 <div className='formActions'>
                     <form onSubmit={formik.handleSubmit}>
-                        <p>{error}</p>
+                        <p style = {{color:"firebrick"}}>{authError}</p>
                         <div className='inputField'>
                         <input type = "text"
                         placeholder='username'
